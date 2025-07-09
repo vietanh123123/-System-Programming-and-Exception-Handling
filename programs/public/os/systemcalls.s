@@ -1,3 +1,7 @@
+.equ terminal_data, 0xffff001c
+.equ terminal_ready, 0xffff0018
+
+
 # bootup
 _start: 
     la t0, exception_handler        # setting up exception handler
@@ -43,21 +47,21 @@ exception_handler:
 syscall_putchar:
     # System call 11: Print character in a0
     lw a0, 12(sp)                   # Load character from saved a0
-    jal putchar
+    jal ra, putchar
     j exception_return
 
 syscall_putstring:
     # System call 4: Print null-terminated string at address in a0
     lw a0, 12(sp)                   # Load string address from saved a0
-    jal putstring
+    jal ra, putstring
     j exception_return
 
 
 putchar:
     # Print single character in a0
     # Use symbolic addresses for terminal I/O ports
-    li t0, terminal_data           # Terminal data port address
-    li t1, terminal_ready          # Terminal ready port address
+    la t0, terminal_data           # Terminal data port address
+    la t1, terminal_ready          # Terminal ready port address
     
 putchar_wait:
     lw t2, 0(t1)                   # Read terminal ready register
@@ -79,11 +83,11 @@ putstring:
 putstring_loop:
     lb t0, 0(a0)                   # Load byte from string
     beqz t0, putstring_done        # If null terminator, we're done
-    
+
     # Print the character
     mv a0, t0                      # Move character to a0 for putchar
-    jal putchar
-    
+    jal ra, putchar
+
     lw a0, 4(sp)                   # Restore string address
     addi a0, a0, 1                 # Move to next character
     sw a0, 4(sp)                   # Save updated address
