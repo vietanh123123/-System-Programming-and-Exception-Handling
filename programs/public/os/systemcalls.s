@@ -1,5 +1,4 @@
-.equ terminal_data, 0xffff001c
-.equ terminal_ready, 0xffff0018
+
 
 
 # bootup
